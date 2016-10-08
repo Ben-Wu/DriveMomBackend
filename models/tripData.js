@@ -4,17 +4,27 @@
 var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 
-var UserSchema = new Schema({
-    userId: Number,
-    username: {
-        type: String,
-        required: true,
-        unique: true
+var TripDataSchema = new Schema({
+    userId: {
+        type: Number,
+        required: true
     },
-    password: {
+    tripId: {
+        type: Number,
+        required: true,
+    },
+    value: {
+        type: Schema.Types.Mixed,
+        required: true
+    },
+    name: {
+        type: String,
+        required: true
+    },
+    timestamp: {
         type: String,
         required: true
     }
-})
+});
 
-module.exports = mongoose.model('User', UserSchema)
+module.exports = mongoose.model('TripData', TripDataSchema);
