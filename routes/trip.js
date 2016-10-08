@@ -40,6 +40,7 @@ router.post('/end', function(req, res, next) {
     TripData.find({"userId": req.body.userId, "tripId": req.body.tripId, "name": "accelerator_pedal_position"},
         {"_id": 0, "value": 1, "timestamp": 1}).sort({timestamp: 1}).exec(function (err, accPedalPoints) {
         if(!err) {
+            var hardAccs = 0;
             var lastSpeed = -1;
             for(var i = 0 ; i < accPedalPoints.length ; i++) {
                 if(lastSpeed == -1) {
@@ -48,11 +49,14 @@ router.post('/end', function(req, res, next) {
                 }
                 if(lastSpeed - accPedalPoints[i].value >= 4) {
                     console.log("Hard acceleration at " + accPedalPoints[i].timestamp);
+                    ++hardAccs;
                 }
                 lastSpeed = accPedalPoints[i].value;
             }
+            res.send("Trip done: " + hardAccs + " hard accelerations");
+        } else {
+            res.send("Error processing trip");
         }
-        res.send("Trip done");
     });
 });
 
