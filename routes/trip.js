@@ -79,24 +79,24 @@ function analyzeBraking(req, body, res) {
             var hardBrakes = 0;
             var lastSpeed = -1;
             for(var i = 0 ; i < dataPoint.length ; i++) {
-                if(dataPoint[i].name == "vehicle_speed") {
+                if(lastSpeed == -1 && dataPoint[i].name == "vehicle_speed") {
                     lastSpeed = dataPoint[i].value;
                     continue;
                 }
-                if(lastSpeed == -1) {
-                    continue;
-                }
-                if(dataPoint[i].name == "vehicle_speed" && dataPoint[i].value - lastSpeed >= 10) {
+                if(dataPoint[i].name == "vehicle_speed" && dataPoint[i].value - lastSpeed >= 7) {
                     console.log("Hard brake at " + dataPoint[i].timestamp);
                     ++hardBrakes;
-                } else if(lastSpeed > 30 && Math.abs(dataPoint[i].value) > 300) {
+                } else if(lastSpeed > 30 && Math.abs(dataPoint[i].value) > 330) {
                     console.log("Sharp turn at " + dataPoint[i].timestamp);
                     ++sharpTurns;
                 }
-                lastSpeed = dataPoint[i].value;
+                if(dataPoint[i].name == "vehicle_speed") {
+                    lastSpeed = dataPoint[i].value;
+                }
             }
             body.sharpTurns = sharpTurns;
             body.hardBrakes = hardBrakes;
+            body.score = 100 / ((200 * body.hardBrakes + 30 * body.sharpTurns + 140 * body.hardAccs) / body.duration);
             res.json(body);
             Trip.create(body, function (err, saved) {
                 if(!err) {

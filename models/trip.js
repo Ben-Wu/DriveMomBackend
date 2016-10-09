@@ -18,11 +18,15 @@ var TripSchema = new Schema({
         required: false
     },
     hardBraking: {
-        type: String,
+        type: Number,
         required: false
     },
     sharpTurn: {
-        type: String,
+        type: Number,
+        required: false
+    },
+    score: {
+        type: Number,
         required: false
     }
 });
