@@ -17,7 +17,7 @@ function hashPassword(password) {
 function login(req, res) {
   if(!req.body.username || !req.body.password) {
     res.status(400);
-    res.send("username and password are required");
+    res.json({error: "username and password are required"});
     return;
   }
   console.log("Login: " + req.body.username);
@@ -25,11 +25,11 @@ function login(req, res) {
   User.findOne({"username": req.body.username, "password": hashPassword(req.body.password)}).exec(function (err, user) {
     if(!err && user && user != null) {
       console.log("Login success");
-      res.send("login success");
+      res.json({userId: user.userId});
     } else {
       console.log("Login failed");
       res.status(401);
-      res.send("invalid credentials");
+      res.json({error: "invalid credentials"});
     }
   });
 }
@@ -47,20 +47,20 @@ function signUp(req, res) {
       if(!err && count === 0) {
         req.body.userId = allUsers;
         req.body.password = hashPassword(req.body.password);
-        User.create(req.body, function(err, res2) {
+        User.create(req.body, function(err, newUser) {
           if(!err) {
             console.log("sign up success");
-            res.send("sign up success");
+            res.json({userId: newUser.userId});
           } else {
             console.log("sign up failed");
             res.status(400);
-            res.send("user may already exist");
+            res.json({error: "user may already exist"});
           }
         });
       } else {
         console.log("sign up failed");
         res.status(400);
-        res.send("user may already exist");
+        res.json({error: "user may already exist"});
       }
     });
   });
@@ -75,7 +75,7 @@ router.get('/', function(req, res, next) {
     } else {
       res.status(401);
       console.log("error retrieving users");
-      res.send("error retrieving users");
+      res.json({error: "error retrieving users"});
     }
   });
 });
