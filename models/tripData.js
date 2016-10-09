@@ -5,7 +5,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var TripDataSchema = new Schema({
-        userId: {
+    userId: {
         type: Number,
         required: true
     },

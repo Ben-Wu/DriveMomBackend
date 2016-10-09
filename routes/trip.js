@@ -7,6 +7,17 @@ var router = express.Router();
 var TripData = require("../models/tripData");
 var Trip = require("../models/trip");
 
+// get trips for current user
+router.get("/:userId", function (req, res, next) {
+    Trip.find({"userId": req.params.userId}, {"_id":0, "tripId": 1, "score": 1}).sort({tripId: -1}).exec(function (err, trips) {
+        if(!err) {
+            res.json(trips);
+        } else {
+            res.json({"error": err});
+        }
+    })
+});
+
 router.post('/data', function(req, res, next) {
     if(!req.body.userId || !req.body.tripId || !req.body.data) {
         res.status(400);
@@ -96,7 +107,7 @@ function analyzeBraking(req, body, res) {
             }
             body.sharpTurns = sharpTurns;
             body.hardBrakes = hardBrakes;
-            body.score = 100 / ((200 * body.hardBrakes + 30 * body.sharpTurns + 140 * body.hardAccs) / body.duration);
+            body.score = body.duration / (1 + 200 * body.hardBrakes + 30 * body.sharpTurns + 140 * body.hardAccs);
             res.json(body);
             Trip.create(body, function (err, saved) {
                 if(!err) {
